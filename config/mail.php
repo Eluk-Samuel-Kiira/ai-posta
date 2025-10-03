@@ -36,12 +36,11 @@ return [
     'mailers' => [
         'smtp' => [
             'transport' => 'smtp',
-            'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
+            'host' => env('MAIL_HOST', 'mail.lafabsolution.com'),
             'port' => env('MAIL_PORT', 587),
             'encryption' => env('MAIL_ENCRYPTION', 'tls'),
-            'username' => env('MAIL_USERNAME'),
-            'password' => env('MAIL_PASSWORD'),
+            'username' => env('MAIL_USERNAME', 'admin@lafabsolution.com'),
+            'password' => env('MAIL_PASSWORD', ''),
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN'),
         ],
@@ -93,6 +92,10 @@ return [
                 'ses',
                 'postmark',
             ],
+        ],
+        'from' => [
+            'address' => env('MAIL_FROM_ADDRESS', 'admin@lafabsolution.com'),
+            'name' => env('MAIL_FROM_NAME', 'AI Assisted Posting'),
         ],
     ],
 
