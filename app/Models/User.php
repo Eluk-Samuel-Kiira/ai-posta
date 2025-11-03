@@ -3,89 +3,88 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
-        'username',
-        'name',
+        'uuid',
         'email',
-        'company',
-        'profile_image',
-        'role',
-        'password',
+        'first_name',
+        'last_name',
+        'phone',
+        'user_type',
+        'email_verified_at',
+        'magic_link_token',
+        'magic_link_sent_at',
+        'magic_link_expires_at',
+        'country_code',
+        'is_active',
+        'last_login_at',
     ];
 
     protected $hidden = [
-        'password',
-        'remember_token',
+        'magic_link_token',
     ];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
+        'magic_link_sent_at' => 'datetime',
+        'magic_link_expires_at' => 'datetime',
+        'last_login_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
-    public function loginTokens()
+    protected static function boot()
     {
-        return $this->hasMany(LoginToken::class);
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = Str::uuid();
+            }
+        });
     }
 
-    // Role checking methods
+    public function getFullNameAttribute()
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
     public function isAdmin()
     {
-        return $this->role === 'admin';
+        return $this->user_type === 'admin';
     }
 
-    public function isInsider()
+    public function isEmployer()
     {
-        return $this->role === 'insider';
+        return $this->user_type === 'employer';
     }
 
-    public function isOutsider()
+    public function isEmployee()
     {
-        return $this->role === 'outsider';
+        return $this->user_type === 'employee';
     }
 
-    // Scope methods for filtering by role
-    public function scopeAdmins($query)
+    public function isInternee()
     {
-        return $query->where('role', 'admin');
+        return $this->user_type === 'internee';
     }
 
-    public function scopeInsiders($query)
+    public function isVolunteer()
     {
-        return $query->where('role', 'insider');
+        return $this->user_type === 'volunteer';
     }
 
-    public function scopeOutsiders($query)
+    public function isMagicLinkValid()
     {
-        return $query->where('role', 'outsider');
+        return $this->magic_link_token && 
+               $this->magic_link_expires_at && 
+               $this->magic_link_expires_at->isFuture();
     }
-
-    // Profile image URL accessor
-    // public function getProfileImageUrlAttribute()
-    // {
-    //     if ($this->profile_image) {
-    //         return asset('storage/profile-images/' . $this->profile_image);
-    //     }
-        
-    //     // Default profile image based on role
-    //     return $this->getDefaultProfileImage();
-    // }
-
-    // protected function getDefaultProfileImage()
-    // {
-    //     $defaultImages = [
-    //         'admin' => asset('images/default-admin.png'),
-    //         'insider' => asset('images/default-insider.png'),
-    //         'outsider' => asset('images/default-user.png'),
-    //     ];
-
-    //     return $defaultImages[$this->role] ?? asset('images/default-user.png');
-    // }
 }

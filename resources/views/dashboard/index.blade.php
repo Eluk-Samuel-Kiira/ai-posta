@@ -1,38 +1,10 @@
-@extends('dashboard.layout')
-
-@section('title', 'Dashboard - LaFab AI Posting')
+@extends('dashboard.layout', [
+    'pageTitle' => 'Dashboard Overview',
+    'pageSubtitleLine1' => 'Welcome back, ' . auth()->user()->first_name . '!',
+    'pageSubtitleLine2' => 'Here\'s your AI-powered hiring insights.'
+])
 
 @section('content')
-<!-- Mobile Header -->
-<div class="d-lg-none bg-primary text-white p-3">
-    <div class="d-flex align-items-center">
-        <button class="btn btn-light me-3" onclick="toggleSidebar()">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div>
-            <h5 class="mb-0">Dashboard</h5>
-            <small>Welcome back, {{ auth()->user()->username ?? 'User' }}</small>
-        </div>
-    </div>
-</div>
-
-<!-- Desktop Header -->
-<div class="content-header bg-white shadow-sm d-none d-lg-block">
-    <div class="container-fluid py-4">
-        <div class="row align-items-center">
-            <div class="col">
-                <h1 class="h2 mb-1 text-primary">Dashboard Overview</h1>
-                <p class="text-muted mb-0">Welcome back, {{ auth()->user()->name ?? 'User' }}! Here's your AI-powered hiring insights.</p>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-primary sidebar-toggle" onclick="toggleSidebar()">
-                    <i class="fas fa-bars me-2"></i>
-                    <span>Menu</span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Main Content -->
 <div class="container-fluid py-4">

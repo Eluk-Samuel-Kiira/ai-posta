@@ -7,7 +7,7 @@
 @section('auth-subtitle', 'Enter your email to receive a magic login link')
 
 @section('auth-content')
-<form method="POST" action="{{ route('auth.login-link') }}">
+<form method="POST" action="{{ route('auth.send-login-link') }}">
     @csrf
     <div class="mb-3">
         <label for="email" class="form-label">Email Address</label>

@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\LoginToken;
-use App\Models\User;
+use App\Models\{User};
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\{Auth,Hash,Mail};
 use Illuminate\Support\Str;
-use App\Mail\MagicLoginLink;
+use App\Mail\{MagicLoginLink};
 
 class AuthController extends Controller
 {
@@ -82,6 +80,11 @@ class AuthController extends Controller
         // Log the user in
         Auth::login($loginToken->user);
 
+        // Update user's last login
+        $loginToken->user->update([
+            'last_login_at' => now()
+        ]);
+
         // Mark token as used
         $loginToken->markAsUsed();
 
@@ -95,37 +98,30 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'username' => 'required|string|max:255|unique:users',
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users',
+            'phone' => 'nullable|string|max:20',
             'company' => 'nullable|string|max:255',
-            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'role' => 'required|in:outsider,insider',
+            'user_type' => 'required|in:employer,admin',
+            'country_code' => 'sometimes|string|max:3',
             'terms' => 'required|accepted',
         ], [
             'terms.required' => 'You must agree to the Terms of Service and Privacy Policy.',
             'terms.accepted' => 'You must agree to the Terms of Service and Privacy Policy.',
-            'role.in' => 'Please select a valid account type.',
+            'user_type.in' => 'Please select a valid account type.',
         ]);
-
-        // Handle profile image upload
-        $profileImagePath = null;
-        if ($request->hasFile('profile_image')) {
-            $profileImagePath = $request->file('profile_image')->store('profile-images', 'public');
-            
-            // Get just the filename
-            $profileImagePath = basename($profileImagePath);
-        }
 
         // Create user
         $user = User::create([
-            'username' => $request->username,
-            'name' => $request->name,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
             'email' => $request->email,
-            'company' => $request->company,
-            'profile_image' => $profileImagePath,
-            'role' => $request->role,
-            'password' => Hash::make(Str::random(32)),
+            'phone' => $request->phone,
+            'user_type' => $request->user_type,
+            'country_code' => $request->country_code ?? 'UG',
+            'is_active' => true,
+            'email_verified_at' => now(), // Auto-verify for magic link registration
         ]);
 
         // Create login token
@@ -175,6 +171,4 @@ class AuthController extends Controller
             })
             ->delete();
     }
-
-    
 }

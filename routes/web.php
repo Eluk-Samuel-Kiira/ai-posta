@@ -1,8 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashBoardController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\JobPostingController;
+use App\Http\Controllers\CandidateController;
+use App\Http\Controllers\AIAssistantController;
+use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\SettingsController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,67 +22,111 @@ use App\Http\Controllers\DashBoardController;
 |
 */
 
+// Public Routes
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
 // Authentication Routes
-Route::get('/login', [AuthController::class, 'showLogin'])->name('auth.login');
-Route::post('/login-link', [AuthController::class, 'sendLoginLink'])->name('auth.login-link');
-Route::get('/login/{token}', [AuthController::class, 'authenticate'])->name('auth.authenticate');
-Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
-
-// Registration Routes
-Route::get('/register', [AuthController::class, 'showRegister'])->name('auth.register');
-Route::post('/register', [AuthController::class, 'register'])->name('auth.register.submit');
-
-// Invalid Token
-Route::get('/invalid-token', [AuthController::class, 'invalidToken'])->name('auth.invalid-token');
-
-// routes/web.php - Add this temporary route
-Route::get('/test-email', function () {
-    try {
-        \Log::info('Testing email configuration...');
-        
-        // Test basic SMTP connection
-        $transport = new \Swift_SmtpTransport(
-            env('MAIL_HOST'),
-            env('MAIL_PORT'),
-            env('MAIL_ENCRYPTION')
-        );
-        $transport->setUsername(env('MAIL_USERNAME'));
-        $transport->setPassword(env('MAIL_PASSWORD'));
-        
-        $mailer = new \Swift_Mailer($transport);
-        
-        // Test the connection
-        $mailer->getTransport()->start();
-        \Log::info('SMTP connection successful');
-        
-        // Test sending an actual email
-        Mail::raw('Test email from LaFab Solution', function ($message) {
-            $message->to('test@example.com')
-                    ->subject('Test Email Configuration');
-        });
-        
-        \Log::info('Test email sent successfully');
-        return 'Email configuration is working!';
-        
-    } catch (\Exception $e) {
-        \Log::error('Email test failed: ' . $e->getMessage());
-        return 'Email error: ' . $e->getMessage();
-    }
+Route::middleware('guest')->group(function () {
+    // Login Routes
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('auth.login');
+    Route::post('/login', [AuthController::class, 'sendLoginLink'])->name('auth.send-login-link');
+    
+    // Register Routes
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('auth.register');
+    Route::post('/register', [AuthController::class, 'register'])->name('auth.register.submit');
+    
+    // Magic Link Authentication
+    Route::get('/login/{token}', [AuthController::class, 'authenticate'])->name('auth.authenticate');
 });
 
-// Protected Dashboard Routes
-Route::middleware(['auth'])->group(function () {
+// Invalid Token Route (Public)
+Route::get('/invalid-token', [AuthController::class, 'invalidToken'])->name('auth.invalid-token');
+
+// Logout Route (Accessible to both authenticated and guest users)
+Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+
+// Protected Routes (Require Authentication)
+Route::middleware('auth')->group(function () {
+    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/job-parser', [DashboardController::class, 'jobParser'])->name('job-parser');
-    Route::get('/companies', [DashboardController::class, 'companies'])->name('companies');
-    Route::get('/job-postings', [DashboardController::class, 'jobPostings'])->name('job-postings');
-    Route::get('/ai-assistant', [DashboardController::class, 'aiAssistant'])->name('ai-assistant');
-    Route::get('/analytics', [DashboardController::class, 'analytics'])->name('analytics');
-    Route::get('/candidates', [DashboardController::class, 'candidates'])->name('candidates');
-    Route::get('/templates', [DashboardController::class, 'templates'])->name('templates');
-    Route::get('/settings', [DashboardController::class, 'settings'])->name('settings');
+    
+    // Companies Management
+    Route::prefix('companies')->name('companies.')->group(function () {
+        Route::get('/', [CompanyController::class, 'index'])->name('index');
+        Route::get('/create', [CompanyController::class, 'create'])->name('create');
+        Route::post('/', [CompanyController::class, 'store'])->name('store');
+        Route::get('/{company}', [CompanyController::class, 'show'])->name('show');
+        Route::get('/{company}/edit', [CompanyController::class, 'edit'])->name('edit');
+        Route::put('/{company}', [CompanyController::class, 'update'])->name('update');
+        Route::delete('/{company}', [CompanyController::class, 'destroy'])->name('destroy');
+        Route::get('/get/{company}', [CompanyController::class, 'get'])->name('get');
+    });
+    
+    // Job Postings Management
+    Route::prefix('job-postings')->name('job-postings.')->group(function () {
+        Route::get('/', [JobPostingController::class, 'index'])->name('index');
+        Route::get('/create', [JobPostingController::class, 'create'])->name('create');
+        Route::post('/', [JobPostingController::class, 'store'])->name('store');
+        Route::get('/{jobPosting}', [JobPostingController::class, 'show'])->name('show');
+        Route::get('/{jobPosting}/edit', [JobPostingController::class, 'edit'])->name('edit');
+        Route::put('/{jobPosting}', [JobPostingController::class, 'update'])->name('update');
+        Route::delete('/{jobPosting}', [JobPostingController::class, 'destroy'])->name('destroy');
+        Route::post('/{jobPosting}/publish', [JobPostingController::class, 'publish'])->name('publish');
+        Route::post('/{jobPosting}/unpublish', [JobPostingController::class, 'unpublish'])->name('unpublish');
+    });
+    
+    // Candidates Management
+    Route::prefix('candidates')->name('candidates.')->group(function () {
+        Route::get('/', [CandidateController::class, 'index'])->name('index');
+        Route::get('/create', [CandidateController::class, 'create'])->name('create');
+        Route::post('/', [CandidateController::class, 'store'])->name('store');
+        Route::get('/{candidate}', [CandidateController::class, 'show'])->name('show');
+        Route::get('/{candidate}/edit', [CandidateController::class, 'edit'])->name('edit');
+        Route::put('/{candidate}', [CandidateController::class, 'update'])->name('update');
+        Route::delete('/{candidate}', [CandidateController::class, 'destroy'])->name('destroy');
+    });
+    
+    // AI Assistant
+    Route::prefix('ai-assistant')->name('ai-assistant.')->group(function () {
+        Route::get('/', [AIAssistantController::class, 'index'])->name('index');
+        Route::post('/generate-description', [AIAssistantController::class, 'generateDescription'])->name('generate-description');
+        Route::post('/optimize-posting', [AIAssistantController::class, 'optimizePosting'])->name('optimize-posting');
+        Route::post('/suggest-improvements', [AIAssistantController::class, 'suggestImprovements'])->name('suggest-improvements');
+    });
+    
+    // Analytics
+    Route::prefix('analytics')->name('analytics.')->group(function () {
+        Route::get('/', [AnalyticsController::class, 'index'])->name('index');
+        Route::get('/performance', [AnalyticsController::class, 'performance'])->name('performance');
+        Route::get('/candidates', [AnalyticsController::class, 'candidates'])->name('candidates');
+        Route::get('/jobs', [AnalyticsController::class, 'jobs'])->name('jobs');
+    });
+    
+    // Templates Management
+    Route::prefix('templates')->name('templates.')->group(function () {
+        Route::get('/', [TemplateController::class, 'index'])->name('index');
+        Route::get('/create', [TemplateController::class, 'create'])->name('create');
+        Route::post('/', [TemplateController::class, 'store'])->name('store');
+        Route::get('/{template}', [TemplateController::class, 'show'])->name('show');
+        Route::get('/{template}/edit', [TemplateController::class, 'edit'])->name('edit');
+        Route::put('/{template}', [TemplateController::class, 'update'])->name('update');
+        Route::delete('/{template}', [TemplateController::class, 'destroy'])->name('destroy');
+        Route::post('/{template}/duplicate', [TemplateController::class, 'duplicate'])->name('duplicate');
+    });
+    
+    // Settings
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/', [SettingsController::class, 'index'])->name('index');
+        Route::put('/profile', [SettingsController::class, 'updateProfile'])->name('update-profile');
+        Route::put('/security', [SettingsController::class, 'updateSecurity'])->name('update-security');
+        Route::put('/preferences', [SettingsController::class, 'updatePreferences'])->name('update-preferences');
+        Route::put('/notifications', [SettingsController::class, 'updateNotifications'])->name('update-notifications');
+    });
+});
+
+// Fallback Route (404)
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
 });

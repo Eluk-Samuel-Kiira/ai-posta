@@ -3,10 +3,7 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 class MagicLoginLink extends Mailable
@@ -22,31 +19,17 @@ class MagicLoginLink extends Mailable
         $this->isWelcomeEmail = $isWelcomeEmail;
     }
 
-    public function envelope()
+    public function build()
     {
         $subject = $this->isWelcomeEmail 
-            ? 'Welcome to AI Assisted Posting - Your Magic Login Link'
-            : 'Your Magic Login Link for AI Assisted Posting';
+            ? 'Welcome! Your Magic Login Link'
+            : 'Your Magic Login Link';
 
-        return new Envelope(
-            subject: $subject,
-        );
-    }
-
-    public function content()
-    {
-        return new Content(
-            view: 'emails.magic-login-link',
-            with: [
-                'token' => $this->token,
-                'isWelcomeEmail' => $this->isWelcomeEmail,
-                'loginUrl' => route('auth.authenticate', $this->token),
-            ],
-        );
-    }
-
-    public function attachments()
-    {
-        return [];
+        return $this->subject($subject)
+                    ->markdown('emails.magic-login-link')
+                    ->with([
+                        'token' => $this->token,
+                        'isWelcomeEmail' => $this->isWelcomeEmail,
+                    ]);
     }
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-Powered Job Posting | LaFab Solution</title>
+    <title>Job Posting | Katica AI</title>
     
     <!-- Favicon References -->
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
@@ -519,7 +519,7 @@
             <nav>
                 <div class="logo">
                     <i class="fas fa-robot"></i>
-                    <span>LaFab AI Posting</span>
+                    <span>Katica AI Job Posting</span>
                 </div>
                 <div class="nav-links">
                     <a href="#features">Features</a>
@@ -658,7 +658,7 @@
     <section id="cta" class="cta-section">
         <div class="container">
             <h2>Ready to Transform Your Hiring Process?</h2>
-            <p>Join hundreds of companies already using LaFab AI Posting to streamline their recruitment and find better candidates faster.</p>
+            <p>Join hundreds of companies already using Katica AI Job Posting to streamline their recruitment and find better candidates faster.</p>
             <button class="login-btn" onclick="scrollToLogin()" style="font-size: 1.2rem; padding: 18px 45px;">Start Posting with AI</button>
         </div>
     </section>
@@ -668,7 +668,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-column">
-                    <h3>LaFab AI Posting</h3>
+                    <h3>Katica AI Job Posting </h3>
                     <p>Revolutionizing recruitment through AI-powered automation and optimization.</p>
                     <p>LaFab Solution Company Limited</p>
                 </div>
@@ -684,14 +684,19 @@
                 <div class="footer-column">
                     <h3>Contact Info</h3>
                     <ul class="footer-links">
-                        <li><i class="fas fa-envelope"></i> admin@lafabsolution.com</li>
+                        <li><i class="fas fa-envelope"></i> admin@stardena.com</li>
                         <li><i class="fas fa-phone"></i> +256 704 912354</li>
                         <li><i class="fas fa-map-marker-alt"></i> Kampala, Uganda</li>
                     </ul>
                 </div>
             </div>
             <div class="copyright">
-                <p>&copy; 2025 LaFab Solution Company Limited. All rights reserved.</p>
+                <p class="mb-0">
+                    <a href="https://stardena.com" target="_blank" class="text-decoration-none text-primary fw-semibold d-flex align-items-center">
+                        <i class="fas fa-copyright me-2 small"></i>
+                        <span>2025 Stardena. All rights reserved.</span>
+                    </a>
+                </p>
             </div>
         </div>
     </footer>

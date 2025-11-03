@@ -23,5 +23,5 @@
 @endsection
 
 @section('auth-footer')
-<p>Need help? <a href="mailto:support@lafab.com">Contact Support</a></p>
+<p>Need help? <a href="mailto:admin@stardena.com">Contact Support</a></p>
 @endsection
