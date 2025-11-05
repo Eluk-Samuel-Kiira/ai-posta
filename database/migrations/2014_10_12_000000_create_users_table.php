@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('phone')->nullable();
-            $table->enum('user_type', ['employer', 'admin', 'employee', 'internee', 'volunteer'])->default('volunteer');
+            $table->string('user_type')->default('volunteer');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('magic_link_token')->nullable();
             $table->timestamp('magic_link_sent_at')->nullable();

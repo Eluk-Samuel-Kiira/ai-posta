@@ -18,13 +18,7 @@ class UserSeeder extends Seeder
         User::factory()->count(2)->internee()->create();
         User::factory()->count(2)->employee()->create();
 
-        // Optional: Create specific test users
-        User::factory()->create([
-            'email' => 'samuelkiiraeluk@gmail.com',
-            'first_name' => 'Samack',
-            'last_name' => 'Edu',
-            'user_type' => 'admin',
-        ]);
+        
 
     }
 }

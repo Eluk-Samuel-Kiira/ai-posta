@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserSeeder::class,
+            PermissionSeeder::class,
             OccupationalCategorySeeder::class,
             JobCategorySeeder::class,
             IndustrySeeder::class,
@@ -25,7 +26,20 @@ class DatabaseSeeder extends Seeder
             SalaryRangeSeeder::class,
             ExperienceLevelSeeder::class,
             EducationLevelSeeder::class,
+
+            // payment system
+            PaymentPlanSeeder::class,
+            TransactionSeeder::class,
+
             JobSeeder::class,
+
+            // Promotions & Subscriptions (run last)
+            JobPromotionSeeder::class,
+            CompanySubscriptionSeeder::class,
+
+            // API System (run last)
+            ApiCredentialsSeeder::class,
+            ApiSyncLogSeeder::class,
         ]);
     }
 }

@@ -124,6 +124,25 @@ Route::middleware('auth')->group(function () {
         Route::put('/preferences', [SettingsController::class, 'updatePreferences'])->name('update-preferences');
         Route::put('/notifications', [SettingsController::class, 'updateNotifications'])->name('update-notifications');
     });
+
+    // In routes/web.php a guide for roles/permissions
+    // Route::middleware(['auth', 'role:super_admin'])->group(function () {
+    //     Route::get('/admin/dashboard', 'AdminController@dashboard');
+    // });
+
+    // Route::middleware(['auth', 'role:employer'])->group(function () {
+    //     Route::get('/employer/dashboard', 'EmployerController@dashboard');
+    // });
+
+    // Route::middleware(['auth', 'role:job_seeker'])->group(function () {
+    //     Route::get('/job-seeker/dashboard', 'JobSeekerController@dashboard');
+    // });
+
+    // public function createJob()
+    // {
+    //     $this->authorize('create jobs');
+    //     // Create job logic
+    // }
 });
 
 // Fallback Route (404)
