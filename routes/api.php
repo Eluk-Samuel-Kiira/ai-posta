@@ -1,19 +1,16 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Company\CompanyController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware(['auth:sanctum', 'web'])->group(function () {
+    Route::get('/companies', [CompanyController::class, 'company']);
+    Route::post('/companies', [CompanyController::class, 'store']);
+    Route::put('/companies/{company}', [CompanyController::class, 'update']);
+    Route::delete('/companies/{company}', [CompanyController::class, 'destroy']);
+    Route::patch('/companies/{company}/status', [CompanyController::class, 'updateStatus']);
+    
+    Route::get('/industries', function () {
+        return \App\Models\Industry::all();
+    });
 });

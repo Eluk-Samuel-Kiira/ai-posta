@@ -96,7 +96,8 @@
                             <i class="fas fa-plus me-2 fs-6"></i>
                             <span class="menu-text">Add New Company</span>
                         </a>
-                        <a href="{{ route('companies.index') }}" class="nav-link text-white d-flex align-items-center px-3 py-2 mb-1 rounded-3">
+                        <a href="{{ route('companies.index') }}" 
+                        class="nav-link text-white d-flex align-items-center px-3 py-2 mb-1 rounded-3 {{ request()->routeIs('companies.index') ? 'active' : '' }}">
                             <i class="fas fa-building me-2 fs-6"></i>
                             <span class="menu-text">All Companies</span>
                         </a>
@@ -616,4 +617,198 @@
             }
         }
     });
+</script>
+
+<script>
+    // Initialize sidebar on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        initSidebar();
+        autoExpandActiveSections();
+    });
+
+    // Initialize sidebar functionality
+    function initSidebar() {
+        // Load collapsed state from localStorage for desktop
+        if (window.innerWidth >= 992) {
+            const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            const sidebar = document.getElementById('mainSidebar');
+            if (sidebar && isCollapsed) {
+                sidebar.classList.add('collapsed');
+            }
+            updateToggleButton();
+        }
+    }
+
+    // Auto-expand sections with active child links
+    function autoExpandActiveSections() {
+        const currentPath = window.location.pathname + window.location.search;
+        
+        document.querySelectorAll('.expandable-section').forEach(section => {
+            const links = section.querySelectorAll('.sub-menu a[href]');
+            let hasActiveChild = false;
+            
+            for (let link of links) {
+                const href = link.getAttribute('href');
+                if (!href) continue;
+                
+                // Check if this link matches the current path
+                if (currentPath === href || 
+                    (href !== '/' && currentPath.startsWith(href)) ||
+                    link.classList.contains('active')) {
+                    link.classList.add('active');
+                    hasActiveChild = true;
+                } else {
+                    link.classList.remove('active');
+                }
+            }
+            
+            // Expand section if it has an active child
+            if (hasActiveChild) {
+                section.classList.add('expanded');
+                const arrow = section.querySelector('.section-arrow');
+                if (arrow) arrow.style.transform = 'rotate(180deg)';
+            }
+        });
+    }
+
+    // Toggle expandable sections
+    function toggleSection(element) {
+        const section = element.closest('.expandable-section');
+        const isCurrentlyExpanded = section.classList.contains('expanded');
+        
+        // Close all sections first
+        document.querySelectorAll('.expandable-section').forEach(sec => {
+            sec.classList.remove('expanded');
+            const arrow = sec.querySelector('.section-arrow');
+            if (arrow) arrow.style.transform = 'rotate(0deg)';
+        });
+        
+        // If the clicked section wasn't already expanded, open it
+        if (!isCurrentlyExpanded) {
+            section.classList.add('expanded');
+            const arrow = section.querySelector('.section-arrow');
+            if (arrow) arrow.style.transform = 'rotate(180deg)';
+        }
+    }
+
+    // Close sidebar function
+    function closeSidebar() {
+        const sidebar = document.getElementById('mainSidebar');
+        const overlay = document.getElementById('mobileOverlay');
+        
+        if (sidebar) {
+            sidebar.classList.remove('mobile-open');
+        }
+        if (overlay) {
+            overlay.classList.remove('active');
+        }
+        document.body.classList.remove('sidebar-open');
+    }
+
+    // Toggle sidebar function
+    function toggleSidebar() {
+        const sidebar = document.getElementById('mainSidebar');
+        const overlay = document.getElementById('mobileOverlay');
+        
+        if (!sidebar) return;
+        
+        if (window.innerWidth < 992) {
+            // Mobile behavior
+            const isOpening = !sidebar.classList.contains('mobile-open');
+            
+            sidebar.classList.toggle('mobile-open');
+            
+            if (overlay) {
+                overlay.classList.toggle('active');
+            }
+            
+            document.body.classList.toggle('sidebar-open');
+        } else {
+            // Desktop behavior
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            updateToggleButton();
+        }
+    }
+
+    // Update toggle button for desktop
+    function updateToggleButton() {
+        const sidebar = document.getElementById('mainSidebar');
+        if (sidebar) {
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            const toggleBtns = document.querySelectorAll('.sidebar-toggle');
+            
+            toggleBtns.forEach(btn => {
+                const icon = btn.querySelector('i');
+                const text = btn.querySelector('span');
+                
+                if (isCollapsed) {
+                    icon.className = 'fas fa-chevron-right me-2';
+                    if (text) text.textContent = 'Expand Menu';
+                } else {
+                    icon.className = 'fas fa-chevron-left me-2';
+                    if (text) text.textContent = 'Collapse Menu';
+                }
+            });
+        }
+    }
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        const sidebar = document.getElementById('mainSidebar');
+        
+        if (window.innerWidth >= 992) {
+            // Desktop - ensure mobile state is cleared
+            if (sidebar) {
+                sidebar.classList.remove('mobile-open');
+            }
+            document.body.classList.remove('sidebar-open');
+            
+            const overlay = document.getElementById('mobileOverlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+        } else {
+            // Mobile - ensure desktop collapsed state is cleared
+            if (sidebar) {
+                sidebar.classList.remove('collapsed');
+            }
+        }
+        
+        updateToggleButton();
+    });
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+        if (window.innerWidth < 992) {
+            const sidebar = document.getElementById('mainSidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            const isSidebarClick = event.target.closest('#mainSidebar');
+            const isToggleButton = event.target.closest('.mobile-sidebar-toggle');
+            
+            if (!isSidebarClick && !isToggleButton && sidebar && sidebar.classList.contains('mobile-open')) {
+                closeSidebar();
+            }
+        }
+    });
+
+    // Simulate route changes for demonstration
+    function simulateRouteChange(route) {
+        // Update URL without reloading page
+        window.history.pushState({}, '', route);
+        
+        // Remove active class from all links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        
+        // Add active class to the matching link
+        const matchingLink = document.querySelector(`.nav-link[href="${route}"]`);
+        if (matchingLink) {
+            matchingLink.classList.add('active');
+        }
+        
+        // Auto-expand sections with active children
+        autoExpandActiveSections();
+    }
 </script>

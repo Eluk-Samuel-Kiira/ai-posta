@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\Company\{ CompanyController };
 use App\Http\Controllers\JobPostingController;
 use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\AIAssistantController;
@@ -46,6 +46,8 @@ Route::get('/invalid-token', [AuthController::class, 'invalidToken'])->name('aut
 
 // Logout Route (Accessible to both authenticated and guest users)
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+
+
 
 // Protected Routes (Require Authentication)
 Route::middleware('auth')->group(function () {
